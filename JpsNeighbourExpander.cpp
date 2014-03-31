@@ -1,0 +1,123 @@
+#include "JpsNeighbourExpander.h"
+#include <vector>
+#include <cassert>
+void JpsNeighbourExpander::expandSuccessors(const Node *node){
+	ret.clear();
+	findNeighbours(node);
+	//查找跳点
+	for(std::vector<Node*>::reverse_iterator it = ret.rbegin(); it != ret.rend(); ++it){
+		bool skip = false;
+		Node* neighbour = *it;
+		Node* jumpNode = jump(neighbour, node, m_holder->getEndNode());
+		if(jumpNode){
+			m_holder->insertNodeToOpen(jumpNode, node);
+		}
+	}
+}
+
+void JpsNeighbourExpander::findNeighbours(const Node* node){
+	if(node->getParent() == NULL){//没有父节点，一般来说，只可能是因为，本node为start节点
+		NeighbourExpander::expandSuccessors(node);//那么，使用父类的expandSuccessors就可以了
+		return;
+	}
+	const int x = node->getX();
+	const int y = node->getY();//缓存自己的坐标。
+
+	const int ddx = x - node->getParent()->getX();
+	const int dx = ddx / std::max(std::abs(ddx), 1);//我们的程序中，邻居总是跟它的父节点相差『1，1』。
+	const int ddy = y - node->getParent()->getY();
+	const int dy = ddy / std::max(std::abs(ddy), 1);
+
+	assert(dx != 0 || dy != 0);//邻居
+
+	if(dx != 0 && dy != 0){//斜线方向
+		//自然邻居
+		bool walkY = addNeighbours_Diagonal_Natural(x, y+dy, node);
+		bool walkX = addNeighbours_Diagonal_Natural(x+dx, y, node);
+		//if(walkX || walkY){
+		//	ret.push_back(m_holder->getMap()->getNode(x+dx, y+dy));//原算法这里没有判断有没有阻挡。不知道为什么。
+		//	//addNeighbours_Diagonal_DiagonalNatural(x+dx, y+dy);这是我认为的，需要判断阻挡的操作。先注释掉。以后看看有没有用
+		//}
+		//ret.push_back(m_holder->getMap()->getNode(x+dx, y+dy));//原算法这里没有判断有没有阻挡。不知道为什么。
+		addNeighbours_Diagonal_DiagonalNatural(x+dx, y+dy, node);
+		//强制邻居
+		addNeighbours_Diagonal_Force(x-dx, y, x-dx, y+dy, walkY, node);
+		addNeighbours_Diagonal_Force(x, y-dy, x+dx, y-dy, walkY, node);
+	}
+	else{
+		if(dx != 0){//x方向
+			//自然邻居
+			addNeighbours_Directional_Natural(x + dx, y, node);
+			//看看有没有强制邻居。
+			addNeighbours_Directional_Force(x, y+1, x+dx, y+1, node);
+			addNeighbours_Directional_Force(x, y-1, x+dx, y-1, node);
+		}
+		else{//y方向
+			assert(dy != 0);
+			//自然邻居
+			addNeighbours_Directional_Natural(x, y + dy, node);
+			//看看有没有强制邻居。
+			addNeighbours_Directional_Force(x+1, y, x+1, y+dy, node);
+			addNeighbours_Directional_Force(x-1, y, x-1, y+dy, node);
+		}
+	}
+}
+Node* JpsNeighbourExpander::jump(Node* node, const Node* parent, const Node* endNode) const
+{
+	if( node == NULL || node->isBlock())//如果本节点不存在或者是阻挡点，就不能跳
+		return NULL;
+
+	const int x = node->getX();
+	const int y = node->getY();//缓存自己的坐标。
+
+	const int dx = x - parent->getX();
+	const int dy = y - parent->getY();
+	
+	/*if(!m_holder->getMap()->isWalkableAt(x,y){//再开头已经判断过了
+		return NULL;
+	}*/
+	if(node == endNode){//等于终止节点，停止搜索
+		return node;
+	}
+	if(dx != 0 && dy != 0){//斜向
+		//本节点是跳点，如果左右方向邻居是强制邻居（至少一个是就可以了）
+		if(m_holder->getMap()->isWalkableAt(x-dx, y+dy) && !m_holder->getMap()->isWalkableAt(x-dx, y)
+		|| m_holder->getMap()->isWalkableAt(x+dx, y-dy) && !m_holder->getMap()->isWalkableAt(x, y-dy)
+		){
+			return node;
+		}
+	}
+	else{
+		if(dx != 0){//x方向：
+			//上下2个邻居有一个是强制邻居，则此节点为跳点
+			if(m_holder->getMap()->isWalkableAt(x+dx, y+1) && !m_holder->getMap()->isWalkableAt(x, y+1)
+			|| m_holder->getMap()->isWalkableAt(x+dx, y-1) && !m_holder->getMap()->isWalkableAt(x, y-1)
+				){
+				return node;
+			}
+		}
+		else{//y方向：
+			//左右2个邻居有一个是强制邻居，则此节点为跳点
+			if(m_holder->getMap()->isWalkableAt(x+1, y+dy) && !m_holder->getMap()->isWalkableAt(x+1, y)
+			|| m_holder->getMap()->isWalkableAt(x-1, y+dy) && !m_holder->getMap()->isWalkableAt(x-1, y)
+				){
+				return node;
+			}
+		}
+	}
+	//斜向的话还需要递归检查直向节点是不是跳点
+	if(dx != 0 && dy != 0){//斜向	
+		if(jump(m_holder->getMap()->getNode(x+dx, y), node, endNode) != NULL){
+			return node;//注意，返回的不是递归搜索到的点，而是自己
+		}
+		if(jump(m_holder->getMap()->getNode(x, y+dy), node, endNode) != NULL){
+			return node;//注意，返回的不是递归搜索到的点，而是自己
+		}
+	}
+	//递归斜向搜索
+	if(m_holder->getMap()->isWalkableAt(x+dx, y) || m_holder->getMap()->isWalkableAt(x, y+dy)){
+		return jump(m_holder->getMap()->getNode(x+dx, y+dy), node, endNode);
+	}
+	//什么也没有找到，返回错误。
+	return NULL;
+}

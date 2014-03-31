@@ -5,13 +5,18 @@
 #include "node.h"
 #include <string>
 #include "Timer.h"
-
+#include "JpsNeighbourExpander.h"
+#include "NeighbourExpander.h"
 using namespace std;
 
 int main(int argc, char** argv)
 {
     AStar astar;
     astar.setDistanceFunc(&Diagonal);
+	NeighbourExpander ne(&astar);
+	JpsNeighbourExpander jne(&astar);
+	astar.setNeighbourExpander(&ne);
+
     
 
 	string path = argv[1];
@@ -22,8 +27,8 @@ int main(int argc, char** argv)
     map.setMap(mapName.c_str());
 	
     astar.setMap(&map);
-    Node* start = map.getNode(511,0);
-    Node* end = map.getNode(0,511);
+    Node* start = map.getNode(4,0);
+    Node* end = map.getNode(500,511);
     astar.setStardAndEnd(*start, *end);
 
 	ofstream os(result.c_str());
@@ -32,11 +37,7 @@ int main(int argc, char** argv)
 	AStar::FindPathResult fpResult = astar.findPath(*start, *end);
 	timer.end();
 	os << "findPath time: "<< timer.getTimer() << endl;
-    if(fpResult == AStar::fp_FoundRoute){
-        map.dumpMap(os, astar.getPath());
-    }
-	else
-		os << "没有找到路径！";
+    map.dumpMap(os, astar.getPath());
 	
     
 	getchar();

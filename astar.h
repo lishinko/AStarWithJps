@@ -4,6 +4,7 @@
 #include "heap.h"
 #include <cmath>
 class Map;
+class NeighbourExpander;
 typedef float (*DistanceFunc)(const Node* base, const Node* neighbour);
 float Euclidean(const Node* base, const Node* neighbour);
 float Diagonal(const Node* base, const Node* neighbour);
@@ -21,6 +22,7 @@ public:
 
     AStar();
     void setMap(const Map* map){m_map = map;}
+	void setNeighbourExpander(NeighbourExpander* expander){m_expander = expander;}
     //寻路算法，路径保存在Node的里面。
     FindPathResult findPath(const Node& start, const Node& end);
 
@@ -29,19 +31,29 @@ public:
         m_distanceFunc = func;
     }
     std::vector<const Node*> getPath();
+
+	const Map* getMap(){return m_map;}
+	void pushToOpen(const Node* node){m_open.push(node);}
+	bool inOpen(const Node* node) const{return m_open.has(node);}
+	float getDis(const Node* node, const Node* parent) const{return m_distanceFunc(node, parent);}
+
+	void insertNodeToOpen(Node* node, const Node* parent);
+	const Node* getEndNode(){return m_end;}
 protected:
     FindPathResult findpathImpl();
     void expandSuccessors(const Node* node);
     bool inClosed(const Node* node){return std::find(m_closed.begin(), m_closed.end(), node) != m_closed.end();}
+	
+
 
     const Map* m_map;
     Heap m_open;
-    std::vector<const Node*> m_closed;
+    std::vector<const Node*> m_closed;//closed表就不需要排序了
     DistanceFunc m_distanceFunc;
+	NeighbourExpander* m_expander;
 
     const Node* m_start;
     const Node* m_end;
-
 };
 
 #endif // ASTAR_H

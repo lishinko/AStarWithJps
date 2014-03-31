@@ -29,11 +29,11 @@ public:
         :m_coordIdx(0),m_rect(rect),m_startNode(startNode) {
         operator ++();//保证刚开始调用的是正确的点
     }
-    const NeighbourIterator& operator++(){
+    const NeighbourIterator& operator++(){//operator++必须保证找到的就是一个可以使用的邻居。
         ++m_coordIdx;
         const int coordsSize = sizeof(coords) / sizeof(Point);
         Node* ret = getNeighbour(coordsSize, coords);
-        while(ret == NULL && m_coordIdx < coordsSize){
+        while(ret == NULL && m_coordIdx < coordsSize){//m_coordIdx < coordsSize这句话，应该可以提前到外面来。
             ++m_coordIdx;
             ret = getNeighbour(coordsSize, coords);
         }
@@ -59,38 +59,53 @@ protected:
         return m_rect.getNode(x, y);
     }
 };
-class OthogonalNeighbourIterator : public NeighbourIterator
+class JpsNeighbourIterator : public NeighbourIterator
 {
-public:
-    OthogonalNeighbourIterator(const NodeRect& rect, const Node* startNode)
-        :NeighbourIterator(rect, startNode){}
-    Node* operator*() const{
-        static const Point coords[] = {
-            {-1,0},
-            {0,-1},
-            //{0,0},自己，不需要迭代了
-            {0,1},
-            {1,0},
-        };
-        return getNeighbour(sizeof(coords) / sizeof(Point), coords);
-    }
+	JpsNeighbourIterator(const NodeRect& rect, const Node* startNode)
+		: NeighbourIterator(rect, startNode){}
+	const NeighbourIterator& operator++(){
+		++m_coordIdx;
+		const int coordsSize = sizeof(coords) / sizeof(Point);
+		Node* ret = getNeighbour(coordsSize, coords);
+		while(ret == NULL && m_coordIdx < coordsSize){
+			++m_coordIdx;
+			ret = getNeighbour(coordsSize, coords);
+		}
+		return *this;
+	}
 };
-class DiagonalNeighbourIterator : public NeighbourIterator
-{
-public:
-    DiagonalNeighbourIterator(const NodeRect& rect, const Node* startNode)
-        :NeighbourIterator(rect, startNode){}
-    Node* operator*() const{
-        static const Point coords[] = {
-            {-1,-1},
-            {-1,1},
-            //{0,0},自己，不需要迭代了
-            {1,-1},
-            {1,1},
-        };
-        return getNeighbour(sizeof(coords) / sizeof(Point), coords);
-    }
-};
+//class OthogonalNeighbourIterator : public NeighbourIterator
+//{
+//public:
+//    OthogonalNeighbourIterator(const NodeRect& rect, const Node* startNode)
+//        :NeighbourIterator(rect, startNode){}
+//    Node* operator*() const{
+//        static const Point coords[] = {
+//            {-1,0},
+//            {0,-1},
+//            //{0,0},自己，不需要迭代了
+//            {0,1},
+//            {1,0},
+//        };
+//        return getNeighbour(sizeof(coords) / sizeof(Point), coords);
+//    }
+//};
+//class DiagonalNeighbourIterator : public NeighbourIterator
+//{
+//public:
+//    DiagonalNeighbourIterator(const NodeRect& rect, const Node* startNode)
+//        :NeighbourIterator(rect, startNode){}
+//    Node* operator*() const{
+//        static const Point coords[] = {
+//            {-1,-1},
+//            {-1,1},
+//            //{0,0},自己，不需要迭代了
+//            {1,-1},
+//            {1,1},
+//        };
+//        return getNeighbour(sizeof(coords) / sizeof(Point), coords);
+//    }
+//};
 class Map
 {
 public:
@@ -101,13 +116,18 @@ public:
     NeighbourIterator begin(const Node *node) const{
         return NeighbourIterator(m_nodes, node);
     }
-    DiagonalNeighbourIterator beginDiagonal(const Node *node) const{
+    /*DiagonalNeighbourIterator beginDiagonal(const Node *node) const{
         return DiagonalNeighbourIterator(m_nodes, node);
     }
     OthogonalNeighbourIterator beginOthogonal(const Node *node) const{
         return OthogonalNeighbourIterator(m_nodes, node);
-    }
+    }*/
 	void dumpMap(std::ofstream& os, const std::vector<const Node*>& path);
+
+	bool isWalkableAt(const int x, const int y) const{
+		const Node* node = m_nodes.getNode(x,y);
+		return node && !node->isBlock();
+	}
 
 protected:
     NodeRect m_nodes;

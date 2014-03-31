@@ -3,6 +3,7 @@
 #include "node.h"
 #include <stack>
 #include <iostream>
+#include "NeighbourExpander.h"
 using namespace std;
 AStar::AStar()
     :m_distanceFunc(NULL)
@@ -71,32 +72,31 @@ AStar::FindPathResult AStar::findpathImpl()
 
 void AStar::expandSuccessors(const Node *node)
 {
-    for(NeighbourIterator it = m_map->begin(node);*it != NULL;++it)
-    {
-        if((*it)->isBlock() || inClosed(*it))
-        {//如果是阻挡点，或者已经搜索过的点，pass
-            continue;
-        }
-        const float newG = node->getG() + m_distanceFunc(node,*it);
-        if(m_open.has(*it))
-        {//如果已经出现在open表，检查g值，如果较小，就更新
-            if((*it)->getG() > newG)
-            {
-                (*it)->setG(newG);
-                (*it)->setParent(node);
-                m_open.sort();
-            }
-        }
-        else//不是阻挡点，不在closed表，也不在open表，
-        {//创建新open表节点。
-            (*it)->setH(m_distanceFunc(*it, m_end));
-            (*it)->setG(newG);
-            (*it)->setParent(node);
-            m_open.push(*it);
+	m_expander->expandSuccessors(node);
+}
+void AStar::insertNodeToOpen(Node *node, const Node* parent){
+	if(node->isBlock() || inClosed(node))
+    {//如果是阻挡点，或者已经搜索过的点，pass
+        return;
+    }
+    const float newG = parent->getG() + m_distanceFunc(parent,node);
+    if(m_open.has(node))
+    {//如果已经出现在open表，检查g值，如果较小，就更新
+        if(node->getG() > newG)
+        {
+            node->setG(newG);
+            node->setParent(parent);
+            m_open.sort();
         }
     }
+    else//不是阻挡点，不在closed表，也不在open表，
+    {//创建新open表节点。
+        node->setH(m_distanceFunc(node, m_end));
+        node->setG(newG);
+        node->setParent(parent);
+        m_open.push(node);
+    }
 }
-
 void AStar::setStardAndEnd(const Node& start, const Node& end)
 {
 	if(m_map->getNode(start.getX(), start.getY()) == NULL)
