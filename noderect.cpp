@@ -1,6 +1,7 @@
 #include "noderect.h"
 #include <cassert>
 NodeRect::NodeRect()
+: m_nodes(NULL)
 {
 }
 
@@ -19,7 +20,7 @@ Node* NodeRect::getNode(const int x, const int y) const
     if(x >= 0 && y >= 0
        && x < m_width && y < m_height)
     {
-        return &m_nodes[x * m_width + y];
+        return &m_nodes[x * m_height + y];
     }
     return NULL;
 }

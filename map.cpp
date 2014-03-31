@@ -29,10 +29,12 @@ void Map::setMap(const char *mapString)
             char c = tmp.at(x);
             if(c == ' '){
                 Node* node = m_nodes.getNode(x, y);
+				assert(node);
                 node->init(x,y,false);
             }
             else if(c == '*'){
                 Node* node = m_nodes.getNode(x, y);
+				assert(node);
                 node->init(x,y,true);
             }
             else{
@@ -40,6 +42,7 @@ void Map::setMap(const char *mapString)
             }
         }
     }
+	is.close();
 }
 
 void Map::dumpMap()
