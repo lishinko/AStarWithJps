@@ -4,6 +4,8 @@ class Node;
 #include "node.h"
 #include "noderect.h"
 #include <cstddef>
+#include <iosfwd>
+#include <vector>
 struct Point
 {
     int x;
@@ -105,7 +107,7 @@ public:
     OthogonalNeighbourIterator beginOthogonal(const Node *node) const{
         return OthogonalNeighbourIterator(m_nodes, node);
     }
-    void dumpMap();
+	void dumpMap(std::ofstream& os, const std::vector<const Node*>& path);
 
 protected:
     NodeRect m_nodes;

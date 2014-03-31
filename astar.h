@@ -14,6 +14,8 @@ public:
         fp_NoRoute,
         fp_PushedNeighbours,
         fp_FoundRoute,
+		/*fp_StartIsBlock,
+		fp_EndIsBlock,*/
         fp_Invalid,
     };
 
@@ -22,10 +24,7 @@ public:
     //寻路算法，路径保存在Node的里面。
     FindPathResult findPath(const Node& start, const Node& end);
 
-    void setStardAndEnd(const Node& start, const Node& end){
-        m_start = &start;
-        m_end = &end;
-    }
+    void setStardAndEnd(const Node& start, const Node& end);
     void setDistanceFunc(DistanceFunc func){
         m_distanceFunc = func;
     }

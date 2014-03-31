@@ -45,21 +45,26 @@ void Map::setMap(const char *mapString)
 	is.close();
 }
 
-void Map::dumpMap()
+void Map::dumpMap(ofstream& os, const std::vector<const Node*>& path)
 {
+	for(std::vector<const Node*>::const_iterator it = path.begin(); it != path.end(); ++it){
+        os << "(" <<(*it)->getX() << "," << (*it)->getY() << ")->";
+    }
+	os << endl;
+
     for(int y = 0; y < m_nodes.getHeight(); y++){
         for(int x = 0; x < m_nodes.getWidth(); x++){
             const Node* node = getNode(x,y);
             if(node->getParent() != NULL){
-                cout << "-";
+                os << "-";
             }
             else if(node->isBlock()){
-                cout << "*";
+                os << "*";
             }
             else{
-                cout << " ";
+                os << " ";
             }
         }
-        cout << endl;
+        os << endl;
     }
 }

@@ -20,7 +20,9 @@ Node* NodeRect::getNode(const int x, const int y) const
     if(x >= 0 && y >= 0
        && x < m_width && y < m_height)
     {
-        return &m_nodes[x * m_height + y];
+		//手动计算这个真的很容易失误啊。。
+        //return &m_nodes[x * m_height + y];
+		return &m_nodes[y * m_width + x];
     }
     return NULL;
 }

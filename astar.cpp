@@ -97,6 +97,29 @@ void AStar::expandSuccessors(const Node *node)
     }
 }
 
+void AStar::setStardAndEnd(const Node& start, const Node& end)
+{
+	if(m_map->getNode(start.getX(), start.getY()) == NULL)
+	{
+		//start节点不存在
+		return;
+	}
+	if(m_map->getNode(end.getX(), end.getY()) == NULL)
+	{
+		//end节点不存在
+		return;
+	}
+    m_start = &start;
+    m_end = &end;
+	if(m_start->isBlock())
+	{
+		return;
+	}
+	if(m_end->isBlock())
+	{
+		return;
+	}
+}
 
 float Euclidean(const Node *base, const Node *neighbour)
 {//寻路的路径计算方式：直线法
@@ -114,6 +137,6 @@ float Diagonal(const Node *base, const Node *neighbour)
     const int longD = std::max(absoluteX, absoluteY);
     const int shortD = std::min(absoluteX, absoluteY);
     //具体算法：短*斜向 + （长-短）*直向
-    return (float)shortD*1.414 + (float)(longD-shortD)*1;
+    return (float)shortD*1.414f + (float)(longD-shortD)*1.0f;
     //征途2使用10，14（或15）来计算路径，从而避免了浮点数运算的问题。最后考虑这个。
 }
