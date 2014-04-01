@@ -27,8 +27,8 @@ int main(int argc, char** argv)
     map.setMap(mapName.c_str());
 	
     astar.setMap(&map);
-    Node* start = map.getNode(4,0);
-    Node* end = map.getNode(500,511);
+    Node* start = map.getNode(0,0);
+    Node* end = map.getNode(122,127);
     astar.setStardAndEnd(*start, *end);
 
 	ofstream os(result.c_str());
