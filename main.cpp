@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     astar.setDistanceFunc(&Diagonal);
 	NeighbourExpander ne(&astar);
 	JpsNeighbourExpander jne(&astar);
-	astar.setNeighbourExpander(&jne);
+	astar.setNeighbourExpander(&ne);
 
     
 
@@ -27,8 +27,8 @@ int main(int argc, char** argv)
     map.setMap(mapName.c_str());
 	
     astar.setMap(&map);
-    Node* start = map.getNode(4,0);
-    Node* end = map.getNode(500,511);
+    NodeSavingF* start = map.getNode(4,0);
+    NodeSavingF* end = map.getNode(500,511);
     astar.setStardAndEnd(*start, *end);
 
 	ofstream os(result.c_str());

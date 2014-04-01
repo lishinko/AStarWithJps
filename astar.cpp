@@ -5,13 +5,15 @@
 #include <iostream>
 #include "NeighbourExpander.h"
 using namespace std;
+
 AStar::AStar()
     :m_distanceFunc(NULL)
     ,m_map(NULL)
 {
 }
 
-AStar::FindPathResult AStar::findPath(const Node &start, const Node &end)
+
+AStar::FindPathResult AStar::findPath(const NodeSavingF &start, const NodeSavingF &end)
 {
     if(&start == &end){
         return fp_FoundRoute;//开始与结束相同，直接返回就可以了
@@ -31,19 +33,19 @@ AStar::FindPathResult AStar::findPath(const Node &start, const Node &end)
     return fp_Invalid;
 }
 
-std::vector<const Node *> AStar::getPath()
+std::vector<const NodeSavingF*> AStar::getPath()
 {
-    std::vector<const Node*> path;
-//    std::stack<const Node*> s;
-//    for(const Node* pathNode = m_end; pathNode != NULL; pathNode = pathNode->getParent()){
+    std::vector<const NodeSavingF*> path;
+//    std::stack<const NodeSavingF*> s;
+//    for(const NodeSavingF* pathNode = m_end; pathNode != NULL; pathNode = pathNode->getParent()){
 //        s.push(pathNode);
 //    }
 //    while (!s.empty()) {
-//        const Node* node = s.top();
+//        const NodeSavingF* node = s.top();
 //        path.push_back(node);
 //        s.pop();
 //    }
-    for(const Node* pathNode = m_end; pathNode != NULL; pathNode = pathNode->getParent()){
+    for(const NodeSavingF* pathNode = m_end; pathNode != NULL; pathNode = static_cast<const NodeSavingF*>(pathNode->getParent())){
         path.push_back(pathNode);
     }
     cout << path.size() << endl;
@@ -54,7 +56,7 @@ std::vector<const Node *> AStar::getPath()
 
 AStar::FindPathResult AStar::findpathImpl()
 {
-    const Node* node = m_open.pop();
+    const NodeSavingF* node = m_open.pop();
     if(!node)
     {//走投无路，寻路失败了
         return fp_NoRoute;
@@ -70,11 +72,12 @@ AStar::FindPathResult AStar::findpathImpl()
     return fp_PushedNeighbours;
 }
 
-void AStar::expandSuccessors(const Node *node)
+void AStar::expandSuccessors(const NodeSavingF* node)
 {
 	m_expander->expandSuccessors(node);
 }
-void AStar::insertNodeToOpen(Node *node, const Node* parent){
+
+void AStar::insertNodeToOpen(NodeSavingF* node, const NodeSavingF* parent){
 	if(node->isBlock() || inClosed(node))
     {//如果是阻挡点，或者已经搜索过的点，pass
         return;
@@ -97,7 +100,8 @@ void AStar::insertNodeToOpen(Node *node, const Node* parent){
         m_open.push(node);
     }
 }
-void AStar::setStardAndEnd(const Node& start, const Node& end)
+
+void AStar::setStardAndEnd(const NodeSavingF& start, const NodeSavingF& end)
 {
 	if(m_map->getNode(start.getX(), start.getY()) == NULL)
 	{
@@ -121,7 +125,7 @@ void AStar::setStardAndEnd(const Node& start, const Node& end)
 	}
 }
 
-float Euclidean(const Node *base, const Node *neighbour)
+float Euclidean(const NodeSavingF* base, const NodeSavingF* neighbour)
 {//寻路的路径计算方式：直线法
     const int absoluteX = abs(base->getX() - neighbour->getX());
     const int absoluteY = abs(base->getY() - neighbour->getY());
@@ -130,7 +134,7 @@ float Euclidean(const Node *base, const Node *neighbour)
 }
 
 
-float Diagonal(const Node *base, const Node *neighbour)
+float Diagonal(const NodeSavingF* base, const NodeSavingF* neighbour)
 {//寻路的路径计算方式：横，竖线+斜线法。实际上，游戏内就是使用这个来计算的。
     const int absoluteX = abs(base->getX() - neighbour->getX());
     const int absoluteY = abs(base->getY() - neighbour->getY());

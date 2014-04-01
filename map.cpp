@@ -28,12 +28,12 @@ void Map::setMap(const char *mapString)
         for(int x = 0; x < width; x++){
             char c = tmp.at(x);
             if(c == ' '){
-                Node* node = m_nodes.getNode(x, y);
+                NodeSavingF* node = m_nodes.getNode(x, y);
 				assert(node);
                 node->init(x,y,false);
             }
             else if(c == '*'){
-                Node* node = m_nodes.getNode(x, y);
+                NodeSavingF* node = m_nodes.getNode(x, y);
 				assert(node);
                 node->init(x,y,true);
             }
@@ -45,16 +45,16 @@ void Map::setMap(const char *mapString)
 	is.close();
 }
 
-void Map::dumpMap(ofstream& os, const std::vector<const Node*>& path)
+void Map::dumpMap(ofstream& os, const std::vector<const NodeSavingF*>& path)
 {
-	for(std::vector<const Node*>::const_iterator it = path.begin(); it != path.end(); ++it){
+	for(std::vector<const NodeSavingF*>::const_iterator it = path.begin(); it != path.end(); ++it){
         os << "(" <<(*it)->getX() << "," << (*it)->getY() << ")->";
     }
 	os << endl;
 
     for(int y = 0; y < m_nodes.getHeight(); y++){
         for(int x = 0; x < m_nodes.getWidth(); x++){
-            const Node* node = getNode(x,y);
+            const NodeSavingF* node = getNode(x,y);
             if(node->getParent() != NULL){
                 os << "-";
             }

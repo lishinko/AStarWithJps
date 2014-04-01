@@ -8,19 +8,19 @@
 //中文版解释：http://plusplus7.com/lemonbag/jpsstudy
 //英文版解释，推荐：http://zerowidth.com/2013/05/05/jump-point-search-explained.html
 //Lua源代码参考：https://github.com/Yonaba/Jumper
-void AStarWithJps::expandSuccessors(const Node *node){
+void AStarWithJps::expandSuccessors(const NodeSavingF* node){
 	findNeighbours(node);
 	//查找跳点
-	for(std::vector<Node*>::reverse_iterator it = ret.rbegin(); it != ret.rend(); ++it){
+	for(std::vector<NodeSavingF*>::reverse_iterator it = ret.rbegin(); it != ret.rend(); ++it){
 		bool skip = false;
-		Node* neighbour = *it;
-		Node* jumpNode = jump(neighbour, node, m_end);
+		NodeSavingF* neighbour = *it;
+		NodeSavingF* jumpNode = jump(neighbour, node, m_end);
 		if(jumpNode){
 			insertNodeToOpen(jumpNode, node);
 		}
 	}
 }
-void AStarWithJps::findNeighbours(const Node* node){
+void AStarWithJps::findNeighbours(const NodeSavingF* node){
 	if(node->getParent() == NULL){//没有父节点，一般来说，只可能是因为，本node为start节点
 		AStar::expandSuccessors(node);//那么，使用父类的expandSuccessors就可以了
 	}
@@ -66,7 +66,7 @@ void AStarWithJps::findNeighbours(const Node* node){
 		}
 	}
 }
-Node* AStarWithJps::jump(Node* node, const Node* parent, const Node* endNode) const
+NodeSavingF* AStarWithJps::jump(NodeSavingF* node, const NodeSavingF* parent, const NodeSavingF* endNode) const
 {
 	if( node == NULL || node->isBlock())//如果本节点不存在或者是阻挡点，就不能跳
 		return NULL;

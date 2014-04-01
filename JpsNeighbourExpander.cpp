@@ -1,21 +1,21 @@
 #include "JpsNeighbourExpander.h"
 #include <vector>
 #include <cassert>
-void JpsNeighbourExpander::expandSuccessors(const Node *node){
+void JpsNeighbourExpander::expandSuccessors(const NodeSavingF* node){
 	ret.clear();
 	findNeighbours(node);
 	//查找跳点
-	for(std::vector<Node*>::reverse_iterator it = ret.rbegin(); it != ret.rend(); ++it){
+	for(std::vector<NodeSavingF*>::reverse_iterator it = ret.rbegin(); it != ret.rend(); ++it){
 		bool skip = false;
-		Node* neighbour = *it;
-		Node* jumpNode = jump(neighbour, node, m_holder->getEndNode());
+		NodeSavingF* neighbour = *it;
+		NodeSavingF* jumpNode = jump(neighbour, node, m_holder->getEndNode());
 		if(jumpNode){
 			m_holder->insertNodeToOpen(jumpNode, node);
 		}
 	}
 }
 
-void JpsNeighbourExpander::findNeighbours(const Node* node){
+void JpsNeighbourExpander::findNeighbours(const NodeSavingF* node){
 	if(node->getParent() == NULL){//没有父节点，一般来说，只可能是因为，本node为start节点
 		NeighbourExpander::expandSuccessors(node);//那么，使用父类的expandSuccessors就可以了
 		return;
@@ -62,7 +62,7 @@ void JpsNeighbourExpander::findNeighbours(const Node* node){
 		}
 	}
 }
-Node* JpsNeighbourExpander::jump(Node* node, const Node* parent, const Node* endNode) const
+NodeSavingF* JpsNeighbourExpander::jump(NodeSavingF* node, const NodeSavingF* parent, const NodeSavingF* endNode) const
 {
 	if( node == NULL || node->isBlock())//如果本节点不存在或者是阻挡点，就不能跳
 		return NULL;
