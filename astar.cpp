@@ -81,7 +81,12 @@ void AStar::insertNodeToOpen(/*Node**/NodeIdx node, const /*Node**/NodeIdx paren
     }
 	
     //const dis_type newG = parent->getG() + m_distanceFunc(parent,node);
-	const dis_type newG = m_map->getRect().getParts().getG(parent) + m_distanceFunc(parent,node);
+
+	const coord_type parentx = m_map->getRect().getParts().getX(parent);
+	const coord_type parenty = m_map->getRect().getParts().getY(parent);
+	const coord_type nodex = m_map->getRect().getParts().getX(node);
+	const coord_type nodey = m_map->getRect().getParts().getX(node);
+	const dis_type newG = m_map->getRect().getParts().getG(parent) + m_distanceFunc(parentx, parenty, nodex, nodey);
     if(m_open.has(node))
     {//如果已经出现在open表，检查g值，如果较小，就更新
         if(/*node->getG() > newG*/m_map->getRect().getParts().getG(node) > newG)
@@ -95,7 +100,9 @@ void AStar::insertNodeToOpen(/*Node**/NodeIdx node, const /*Node**/NodeIdx paren
     }
     else//不是阻挡点，不在closed表，也不在open表，
     {//创建新open表节点。
-		m_map->getRect().getParts().setH(node, m_distanceFunc(node, m_end));
+		const coord_type endx = m_map->getRect().getParts().getX(m_end);
+		const coord_type endy = m_map->getRect().getParts().getY(m_end);
+		m_map->getRect().getParts().setH(node, m_distanceFunc(nodex, nodey, endx, endy));
 		m_map->getRect().getParts().setG(node, newG);
 		m_map->getRect().getParts().setParent(node, parent);
         /*node->setH(m_distanceFunc(node, m_end));
@@ -150,5 +157,26 @@ dis_type Diagonal(const /*Node**/NodeIdx base, const /*Node**/NodeIdx neighbour)
 	////这里使用了整数来代替1.414这样的浮点数。可以提升性能578->438,性能提升还是比较明显的。
  //   return (dis_type)shortD*14 + (dis_type)(longD-shortD)*10;
 	return 10;
+    //征途2使用10，14（或15）来计算路径，从而避免了浮点数运算的问题。最后考虑这个。
+}
+
+dis_type Euclidean2(const coord_type basex, const coord_type basey, const coord_type neighbourx, const coord_type neighboury)
+{//寻路的路径计算方式：直线法
+	const coord_type absoluteX = abs(basex - neighbourx);
+	const coord_type absoluteY = abs(basey - neighboury);
+    const dis_type square = absoluteX*absoluteX + absoluteY*absoluteY;
+    return std::sqrt(static_cast<float>(square));
+}
+
+
+dis_type Diagonal2(const coord_type basex, const coord_type basey, const coord_type neighbourx, const coord_type neighboury)
+{//寻路的路径计算方式：横，竖线+斜线法。实际上，游戏内就是使用这个来计算的。
+	const coord_type absoluteX = abs(basex - neighbourx);
+	const coord_type absoluteY = abs(basey - neighboury);
+    const coord_type longD = std::max(absoluteX, absoluteY);
+    const coord_type shortD = std::min(absoluteX, absoluteY);
+ //   //具体算法：短*斜向 + （长-短）*直向
+	////这里使用了整数来代替1.414这样的浮点数。可以提升性能578->438,性能提升还是比较明显的。
+    return (dis_type)shortD*14 + (dis_type)(longD-shortD)*10;
     //征途2使用10，14（或15）来计算路径，从而避免了浮点数运算的问题。最后考虑这个。
 }

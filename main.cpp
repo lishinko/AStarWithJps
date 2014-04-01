@@ -12,10 +12,10 @@ using namespace std;
 int main(int argc, char** argv)
 {
     AStar astar;
-    astar.setDistanceFunc(&Diagonal);
+    astar.setDistanceFunc(&Diagonal2);
 	NeighbourExpander ne(&astar);
 	JpsNeighbourExpander jne(&astar);
-	astar.setNeighbourExpander(&jne);
+	astar.setNeighbourExpander(&ne);
 
     
 
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	
     astar.setMap(&map);
     /*Node**/NodeIdx start = map.getNode(0,0);
-    /*Node**/NodeIdx end = map.getNode(104,107);
+    /*Node**/NodeIdx end = map.getNode(6,4);
     astar.setStardAndEnd(start, end);
 
 	ofstream os(result.c_str());
