@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     astar.setDistanceFunc(&Diagonal);
 	NeighbourExpander ne(&astar);
 	JpsNeighbourExpander jne(&astar);
-	astar.setNeighbourExpander(&ne);
+	astar.setNeighbourExpander(&jne);
 
     
 
@@ -27,14 +27,14 @@ int main(int argc, char** argv)
     map.setMap(mapName.c_str());
 	
     astar.setMap(&map);
-    Node* start = map.getNode(4,0);
-    Node* end = map.getNode(500,511);
-    astar.setStardAndEnd(*start, *end);
+    /*Node**/NodeIdx start = map.getNode(0,0);
+    /*Node**/NodeIdx end = map.getNode(104,107);
+    astar.setStardAndEnd(start, end);
 
 	ofstream os(result.c_str());
 	Timer timer;
 	timer.start();
-	AStar::FindPathResult fpResult = astar.findPath(*start, *end);
+	AStar::FindPathResult fpResult = astar.findPath(start, end);
 	timer.end();
 	os << "findPath time: "<< timer.getTimer() << endl;
     map.dumpMap(os, astar.getPath());

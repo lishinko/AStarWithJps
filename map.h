@@ -25,49 +25,53 @@ static const Point coords[] = {
 class NeighbourIterator
 {
 public:
-    NeighbourIterator(const NodeRect& rect, const Node* startNode)
+    NeighbourIterator(const NodeRect& rect, const /*Node**/NodeIdx startNode)
         :m_coordIdx(0),m_rect(rect),m_startNode(startNode) {
         operator ++();//保证刚开始调用的是正确的点
     }
     const NeighbourIterator& operator++(){//operator++必须保证找到的就是一个可以使用的邻居。
         ++m_coordIdx;
         const int coordsSize = sizeof(coords) / sizeof(Point);
-        Node* ret = getNeighbour(coordsSize, coords);
-        while(ret == NULL && m_coordIdx < coordsSize){//m_coordIdx < coordsSize这句话，应该可以提前到外面来。
+        /*Node**/NodeIdx ret = getNeighbour(coordsSize, coords);
+        while(ret == -1 && m_coordIdx < coordsSize){//m_coordIdx < coordsSize这句话，应该可以提前到外面来。
             ++m_coordIdx;
             ret = getNeighbour(coordsSize, coords);
         }
         return *this;
     }
-    Node* operator*() const{
+    /*Node**/NodeIdx operator*() const{
 
         const int coordsSize = sizeof(coords) / sizeof(Point);
-        Node* ret = getNeighbour(coordsSize, coords);
+        /*Node**/NodeIdx ret = getNeighbour(coordsSize, coords);
         return ret;
     }
 protected:
     int m_coordIdx;
     const NodeRect& m_rect;
-    const Node* m_startNode;
-    Node* getNeighbour(const int num,const Point* coords) const{
+    const /*Node**/NodeIdx m_startNode;
+    /*Node**/NodeIdx getNeighbour(const int num,const Point* coords) const{
         if(m_coordIdx >= num)
         {
-            return NULL;
+            return -1;
         }
-        const int x = m_startNode->getX() + coords[m_coordIdx].x;
-        const int y = m_startNode->getY() + coords[m_coordIdx].y;
+		
+        /*const int x = m_startNode->getX() + coords[m_coordIdx].x;
+        const int y = m_startNode->getY() + coords[m_coordIdx].y;*/
+
+		const coord_type x = m_rect.getParts().getX(m_startNode) + coords[m_coordIdx].x;
+        const coord_type y = m_rect.getParts().getY(m_startNode) + coords[m_coordIdx].y;
         return m_rect.getNode(x, y);
     }
 };
 class JpsNeighbourIterator : public NeighbourIterator
 {
-	JpsNeighbourIterator(const NodeRect& rect, const Node* startNode)
+	JpsNeighbourIterator(const NodeRect& rect, const /*Node**/NodeIdx startNode)
 		: NeighbourIterator(rect, startNode){}
 	const NeighbourIterator& operator++(){
 		++m_coordIdx;
 		const int coordsSize = sizeof(coords) / sizeof(Point);
-		Node* ret = getNeighbour(coordsSize, coords);
-		while(ret == NULL && m_coordIdx < coordsSize){
+		/*Node**/NodeIdx ret = getNeighbour(coordsSize, coords);
+		while(ret == -1 && m_coordIdx < coordsSize){
 			++m_coordIdx;
 			ret = getNeighbour(coordsSize, coords);
 		}
@@ -112,8 +116,8 @@ public:
     Map();
     void setMap(const char* mapString);
     void getNeighbours();
-    Node* getNode(coord_type x, coord_type y) const{return m_nodes.getNode(x, y);}
-    NeighbourIterator begin(const Node *node) const{
+    /*Node**/NodeIdx getNode(coord_type x, coord_type y) const{return m_nodes.getNode(x, y);}
+    NeighbourIterator begin(const /*Node**/NodeIdx node) const{
         return NeighbourIterator(m_nodes, node);
     }
     /*DiagonalNeighbourIterator beginDiagonal(const Node *node) const{
@@ -122,15 +126,28 @@ public:
     OthogonalNeighbourIterator beginOthogonal(const Node *node) const{
         return OthogonalNeighbourIterator(m_nodes, node);
     }*/
-	void dumpMap(std::ofstream& os, const std::vector<const Node*>& path);
+	void dumpMap(std::ofstream& os, const std::vector<const /*Node**/NodeIdx>& path);
 
 	bool isWalkableAt(const int x, const int y) const{
-		const Node* node = m_nodes.getNode(x,y);
-		return node && !node->isBlock();
+		const /*Node**/NodeIdx node = m_nodes.getNode(x,y);
+		//return node && !node->isBlock();
+		return node != -1 && !isBlock(node);
 	}
+	bool isBlock(const NodeIdx idx){
+		return m_nodes.getParts().isBlock(idx);
+	}
+	const bool isBlock(const NodeIdx idx) const{
+		return m_nodes.getParts().isBlock(idx);
+	}
+	const dis_type getF(const NodeIdx idx) const{
+		return m_nodes.getParts().getF(idx);
+	}
+	const NodeRect& getRect() const{return m_nodes;}
+	NodeRect& getRect(){return m_nodes;}
 
 protected:
     NodeRect m_nodes;
 };
 
 #endif // MAP_H
+

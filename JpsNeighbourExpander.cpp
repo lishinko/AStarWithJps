@@ -1,32 +1,42 @@
 #include "JpsNeighbourExpander.h"
 #include <vector>
 #include <cassert>
-void JpsNeighbourExpander::expandSuccessors(const Node *node){
+#include "noderect.h"
+void JpsNeighbourExpander::expandSuccessors(const /*Node**/NodeIdx node){
 	ret.clear();
 	findNeighbours(node);
 	//查找跳点
-	for(std::vector<Node*>::reverse_iterator it = ret.rbegin(); it != ret.rend(); ++it){
+	for(std::vector</*Node**/NodeIdx>::reverse_iterator it = ret.rbegin(); it != ret.rend(); ++it){
 		bool skip = false;
-		Node* neighbour = *it;
-		Node* jumpNode = jump(neighbour, node, m_holder->getEndNode());
+		/*Node**/NodeIdx neighbour = *it;
+		/*Node**/NodeIdx jumpNode = jump(neighbour, node, m_holder->getEndNode());
 		if(jumpNode){
 			m_holder->insertNodeToOpen(jumpNode, node);
 		}
 	}
 }
 
-void JpsNeighbourExpander::findNeighbours(const Node* node){
-	if(node->getParent() == NULL){//没有父节点，一般来说，只可能是因为，本node为start节点
+void JpsNeighbourExpander::findNeighbours(const /*Node**/NodeIdx node){
+	if(/*node->getParent() == NULL*/m_holder->getMap()->getRect().getParts().getParent(node) == -1){//没有父节点，一般来说，只可能是因为，本node为start节点
 		NeighbourExpander::expandSuccessors(node);//那么，使用父类的expandSuccessors就可以了
 		return;
 	}
-	const int x = node->getX();
-	const int y = node->getY();//缓存自己的坐标。
+	//const int x = node->getX();
+	//const int y = node->getY();//缓存自己的坐标。
 
-	const int ddx = x - node->getParent()->getX();
-	const int dx = ddx / std::max(std::abs(ddx), 1);//我们的程序中，邻居总是跟它的父节点相差『1，1』。
-	const int ddy = y - node->getParent()->getY();
-	const int dy = ddy / std::max(std::abs(ddy), 1);
+	//const int ddx = x - node->getParent()->getX();
+	//const int dx = ddx / std::max(std::abs(ddx), 1);//我们的程序中，邻居总是跟它的父节点相差『1，1』。
+	//const int ddy = y - node->getParent()->getY();
+	//const int dy = ddy / std::max(std::abs(ddy), 1);
+
+	const coord_type x = m_holder->getMap()->getRect().getParts().getX(node);
+	const coord_type y = m_holder->getMap()->getRect().getParts().getY(node);
+
+	const NodeIdx parent = m_holder->getMap()->getRect().getParts().getParent(node);
+	const coord_type ddx = x - m_holder->getMap()->getRect().getParts().getX(parent);
+	const coord_type dx = ddx / std::max(std::abs(ddx), 1);//我们的程序中，邻居总是跟它的父节点相差『1，1』。
+	const coord_type ddy = y - m_holder->getMap()->getRect().getParts().getY(parent);
+	const coord_type dy = ddy / std::max(std::abs(ddy), 1);
 
 	assert(dx != 0 || dy != 0);//邻居
 
@@ -62,16 +72,22 @@ void JpsNeighbourExpander::findNeighbours(const Node* node){
 		}
 	}
 }
-Node* JpsNeighbourExpander::jump(Node* node, const Node* parent, const Node* endNode) const
+/*Node**/NodeIdx JpsNeighbourExpander::jump(/*Node**/NodeIdx node, const /*Node**/NodeIdx parent, const /*Node**/NodeIdx endNode) const
 {
-	if( node == NULL || node->isBlock())//如果本节点不存在或者是阻挡点，就不能跳
-		return NULL;
+	if( /*node == NULL || node->isBlock()*/node == -1 || m_holder->getMap()->isBlock(node))//如果本节点不存在或者是阻挡点，就不能跳
+		return -1;
 
-	const int x = node->getX();
-	const int y = node->getY();//缓存自己的坐标。
+	//const int x = node->getX();
+	//const int y = node->getY();//缓存自己的坐标。
 
-	const int dx = x - parent->getX();
-	const int dy = y - parent->getY();
+	//const int dx = x - parent->getX();
+	//const int dy = y - parent->getY();
+
+	const coord_type x = m_holder->getMap()->getRect().getParts().getX(node);
+	const coord_type y = m_holder->getMap()->getRect().getParts().getY(node);
+
+	const coord_type dx = x - m_holder->getMap()->getRect().getParts().getX(parent);
+	const coord_type dy = y - m_holder->getMap()->getRect().getParts().getY(parent);
 	
 	/*if(!m_holder->getMap()->isWalkableAt(x,y){//再开头已经判断过了
 		return NULL;

@@ -5,9 +5,9 @@
 #include <cmath>
 class Map;
 class NeighbourExpander;
-typedef dis_type (*DistanceFunc)(const Node* base, const Node* neighbour);
-dis_type Euclidean(const Node* base, const Node* neighbour);
-dis_type Diagonal(const Node* base, const Node* neighbour);
+typedef dis_type (*DistanceFunc)(const /*Node**/NodeIdx base, const /*Node**/NodeIdx neighbour);
+dis_type Euclidean(const /*Node**/NodeIdx base, const /*Node**/NodeIdx neighbour);
+dis_type Diagonal(const /*Node**/NodeIdx base, const /*Node**/NodeIdx neighbour);
 class AStar
 {
 public:
@@ -21,39 +21,39 @@ public:
     };
 
     AStar();
-    void setMap(const Map* map){m_map = map;}
+	void setMap(/*const */Map* map){m_map = map; m_open.setMap(map);}
 	void setNeighbourExpander(NeighbourExpander* expander){m_expander = expander;}
     //寻路算法，路径保存在Node的里面。
-    FindPathResult findPath(const Node& start, const Node& end);
+    FindPathResult findPath(const /*Node**/NodeIdx start, const /*Node**/NodeIdx end);
 
-    void setStardAndEnd(const Node& start, const Node& end);
+    void setStardAndEnd(const /*Node**/NodeIdx start, const /*Node**/NodeIdx end);
     void setDistanceFunc(DistanceFunc func){
         m_distanceFunc = func;
     }
-    std::vector<const Node*> getPath();
+    std::vector<const /*Node**/NodeIdx> getPath();
 
 	const Map* getMap(){return m_map;}
-	void pushToOpen(const Node* node){m_open.push(node);}
-	bool inOpen(const Node* node) const{return m_open.has(node);}
-	dis_type getDis(const Node* node, const Node* parent) const{return m_distanceFunc(node, parent);}
+	void pushToOpen(const /*Node**/NodeIdx node){m_open.push(node);}
+	bool inOpen(const /*Node**/NodeIdx node) const{return m_open.has(node);}
+	dis_type getDis(const /*Node**/NodeIdx node, const /*Node**/NodeIdx parent) const{return m_distanceFunc(node, parent);}
 
-	void insertNodeToOpen(Node* node, const Node* parent);
-	const Node* getEndNode(){return m_end;}
+	void insertNodeToOpen(/*Node**/NodeIdx node, const /*Node**/NodeIdx parent);
+	const /*Node**/NodeIdx getEndNode(){return m_end;}
 protected:
     FindPathResult findpathImpl();
-    void expandSuccessors(const Node* node);
-    bool inClosed(const Node* node){return std::find(m_closed.begin(), m_closed.end(), node) != m_closed.end();}
+    void expandSuccessors(const /*Node**/NodeIdx node);
+    bool inClosed(const /*Node**/NodeIdx node){return std::find(m_closed.begin(), m_closed.end(), node) != m_closed.end();}
 	
 
 
-    const Map* m_map;
+    /*const */Map* m_map;
     Heap m_open;
-    std::vector<const Node*> m_closed;//closed表就不需要排序了
+    std::vector<const /*Node**/NodeIdx> m_closed;//closed表就不需要排序了
     DistanceFunc m_distanceFunc;
 	NeighbourExpander* m_expander;
 
-    const Node* m_start;
-    const Node* m_end;
+    /*Node**/NodeIdx m_start;
+    /*Node**/NodeIdx m_end;
 };
 
 #endif // ASTAR_H

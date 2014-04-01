@@ -54,5 +54,4 @@ protected:
     dis_type f;
     void updateF(){f = g + h;}
 };
-
 #endif // NODE_H
