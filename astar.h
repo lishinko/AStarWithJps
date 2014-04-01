@@ -42,7 +42,7 @@ public:
 		const coord_type parentx = m_map->getRect().getParts().getX(parent);
 		const coord_type parenty = m_map->getRect().getParts().getY(parent);
 		const coord_type nodex = m_map->getRect().getParts().getX(node);
-		const coord_type nodey = m_map->getRect().getParts().getX(node);
+		const coord_type nodey = m_map->getRect().getParts().getY(node);
 		return m_distanceFunc(parentx, parenty, nodex, nodey);
 	}
 

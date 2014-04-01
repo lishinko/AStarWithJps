@@ -82,11 +82,7 @@ void AStar::insertNodeToOpen(/*Node**/NodeIdx node, const /*Node**/NodeIdx paren
 	
     //const dis_type newG = parent->getG() + m_distanceFunc(parent,node);
 
-	const coord_type parentx = m_map->getRect().getParts().getX(parent);
-	const coord_type parenty = m_map->getRect().getParts().getY(parent);
-	const coord_type nodex = m_map->getRect().getParts().getX(node);
-	const coord_type nodey = m_map->getRect().getParts().getX(node);
-	const dis_type newG = m_map->getRect().getParts().getG(parent) + m_distanceFunc(parentx, parenty, nodex, nodey);
+	const dis_type newG = m_map->getRect().getParts().getG(parent) + getDis(node, parent);
     if(m_open.has(node))
     {//如果已经出现在open表，检查g值，如果较小，就更新
         if(/*node->getG() > newG*/m_map->getRect().getParts().getG(node) > newG)
@@ -100,9 +96,7 @@ void AStar::insertNodeToOpen(/*Node**/NodeIdx node, const /*Node**/NodeIdx paren
     }
     else//不是阻挡点，不在closed表，也不在open表，
     {//创建新open表节点。
-		const coord_type endx = m_map->getRect().getParts().getX(m_end);
-		const coord_type endy = m_map->getRect().getParts().getY(m_end);
-		m_map->getRect().getParts().setH(node, m_distanceFunc(nodex, nodey, endx, endy));
+		m_map->getRect().getParts().setH(node, getDis(node, m_end));
 		m_map->getRect().getParts().setG(node, newG);
 		m_map->getRect().getParts().setParent(node, parent);
         /*node->setH(m_distanceFunc(node, m_end));
