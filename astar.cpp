@@ -123,8 +123,8 @@ void AStar::setStardAndEnd(const Node& start, const Node& end)
 
 float Euclidean(const Node *base, const Node *neighbour)
 {//寻路的路径计算方式：直线法
-    const int absoluteX = abs(base->getX() - neighbour->getX());
-    const int absoluteY = abs(base->getY() - neighbour->getY());
+    const coord_type absoluteX = abs(base->getX() - neighbour->getX());
+    const coord_type absoluteY = abs(base->getY() - neighbour->getY());
     const float square = absoluteX*absoluteX + absoluteY*absoluteY;
     return std::sqrt(square);
 }
@@ -132,10 +132,10 @@ float Euclidean(const Node *base, const Node *neighbour)
 
 float Diagonal(const Node *base, const Node *neighbour)
 {//寻路的路径计算方式：横，竖线+斜线法。实际上，游戏内就是使用这个来计算的。
-    const int absoluteX = abs(base->getX() - neighbour->getX());
-    const int absoluteY = abs(base->getY() - neighbour->getY());
-    const int longD = std::max(absoluteX, absoluteY);
-    const int shortD = std::min(absoluteX, absoluteY);
+    const coord_type absoluteX = abs(base->getX() - neighbour->getX());
+    const coord_type absoluteY = abs(base->getY() - neighbour->getY());
+    const coord_type longD = std::max(absoluteX, absoluteY);
+    const coord_type shortD = std::min(absoluteX, absoluteY);
     //具体算法：短*斜向 + （长-短）*直向
     return (float)shortD*1.414f + (float)(longD-shortD)*1.0f;
     //征途2使用10，14（或15）来计算路径，从而避免了浮点数运算的问题。最后考虑这个。

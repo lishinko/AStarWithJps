@@ -2,6 +2,7 @@
 #define NODE_H
 //是否包含f的值？f = g+h,可以比较简单的计算出来。我之前自己实现的A*就是用这种计算的方式表示f的。现在，看看能不能提高下性能吧
 #include <cstddef>
+typedef int coord_type;
 class Node
 {
 public:
@@ -21,8 +22,8 @@ public:
     float getH() const {return h;}
 
     //void updateF(){f = g + h;}
-    int getX() const {return m_x;}
-    int getY() const {return m_y;}
+    coord_type getX() const {return m_x;}
+    coord_type getY() const {return m_y;}
 
     bool isBlock() const {return m_isBlock;}
 
@@ -33,8 +34,8 @@ protected:
     float g;
     float h;
 
-    int m_x;
-    int m_y;
+    coord_type m_x;
+    coord_type m_y;
     bool m_isBlock;
     const Node* m_parent;
 };

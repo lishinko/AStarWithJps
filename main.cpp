@@ -15,7 +15,7 @@ int main(int argc, char** argv)
     astar.setDistanceFunc(&Diagonal);
 	NeighbourExpander ne(&astar);
 	JpsNeighbourExpander jne(&astar);
-	astar.setNeighbourExpander(&jne);
+	astar.setNeighbourExpander(&ne);
 
     
 

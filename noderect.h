@@ -8,7 +8,7 @@ public:
     NodeRect();
     ~NodeRect(){delete[] m_nodes;}
     void allocateNodes(const int width, const int height);
-    Node *getNode(const int x, const int y) const;
+    Node *getNode(const coord_type x, const coord_type y) const;
     int getWidth() const{return m_width;}
     int getHeight() const{return m_height;}
 protected:
