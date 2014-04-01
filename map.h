@@ -112,7 +112,7 @@ public:
     Map();
     void setMap(const char* mapString);
     void getNeighbours();
-    Node* getNode(int x, int y) const{return m_nodes.getNode(x, y);}
+    Node* getNode(coord_type x, coord_type y) const{return m_nodes.getNode(x, y);}
     NeighbourIterator begin(const Node *node) const{
         return NeighbourIterator(m_nodes, node);
     }

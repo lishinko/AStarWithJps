@@ -132,10 +132,10 @@ dis_type Euclidean(const Node *base, const Node *neighbour)
 
 dis_type Diagonal(const Node *base, const Node *neighbour)
 {//寻路的路径计算方式：横，竖线+斜线法。实际上，游戏内就是使用这个来计算的。
-    const int absoluteX = abs(base->getX() - neighbour->getX());
-    const int absoluteY = abs(base->getY() - neighbour->getY());
-    const int longD = std::max(absoluteX, absoluteY);
-    const int shortD = std::min(absoluteX, absoluteY);
+    const coord_type absoluteX = abs(base->getX() - neighbour->getX());
+    const coord_type absoluteY = abs(base->getY() - neighbour->getY());
+    const coord_type longD = std::max(absoluteX, absoluteY);
+    const coord_type shortD = std::min(absoluteX, absoluteY);
     //具体算法：短*斜向 + （长-短）*直向
 	//这里使用了整数来代替1.414这样的浮点数。可以提升性能578->438,性能提升还是比较明显的。
     return (dis_type)shortD*14 + (dis_type)(longD-shortD)*10;

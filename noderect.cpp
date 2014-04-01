@@ -13,7 +13,7 @@ void NodeRect::allocateNodes(const int width, const int height)
     m_nodes = new Node[m_width * m_height];
 }
 
-Node* NodeRect::getNode(const int x, const int y) const
+Node* NodeRect::getNode(const coord_type x, const coord_type y) const
 {
 //    assert(x < m_width && y < m_height);
 //    assert(x >= 0 && y >= 0);

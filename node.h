@@ -23,8 +23,8 @@ public:
     dis_type getH() const {return h;}
 
     //void updateF(){f = g + h;}
-    int getX() const {return m_x;}
-    int getY() const {return m_y;}
+    coord_type getX() const {return m_x;}
+    coord_type getY() const {return m_y;}
 
     bool isBlock() const {return m_isBlock;}
 
@@ -35,8 +35,8 @@ protected:
     dis_type g;
     dis_type h;
 
-    int m_x;
-    int m_y;
+    coord_type m_x;
+    coord_type m_y;
     bool m_isBlock;
     const Node* m_parent;
 };

@@ -12,13 +12,13 @@ protected:
 	void findNeighbours(const Node* node);
 	Node* jump(Node* node, const Node* parent, const Node* endNode) const;
 protected:
-	void addNeighbours_Directional_Natural(const int blockx, const int blocky){
+	void addNeighbours_Directional_Natural(const coord_type blockx, const coord_type blocky){
 		Node* neighbour = m_holder->getMap()->getNode(blockx, blocky);
 		if(neighbour && !neighbour->isBlock()){
 			pushNode(neighbour);//本方向自然邻居。
 		}
 	}
-	void addNeighbours_Directional_Force(const int blockx, const int blocky, const int neighbourx, const int neighboury){
+	void addNeighbours_Directional_Force(const coord_type blockx, const coord_type blocky, const coord_type neighbourx, const coord_type neighboury){
 		if(!m_holder->getMap()->isWalkableAt(blockx, blocky)){
 			Node* neighbour = m_holder->getMap()->getNode(neighbourx, neighboury);
 			if(neighbour && !neighbour->isBlock()){
@@ -26,7 +26,7 @@ protected:
 			}
 		}
 	}
-	bool addNeighbours_Diagonal_Natural(const int blockx, const int blocky){
+	bool addNeighbours_Diagonal_Natural(const coord_type blockx, const coord_type blocky){
 		Node* neighbour = m_holder->getMap()->getNode(blockx, blocky);
 		if(neighbour && !neighbour->isBlock()){
 			pushNode(neighbour);//x,y方向自然邻居
@@ -34,7 +34,7 @@ protected:
 		}
 		return false;
 	}
-	void addNeighbours_Diagonal_DiagonalNatural(const int blockx, const int blocky){
+	void addNeighbours_Diagonal_DiagonalNatural(const coord_type blockx, const coord_type blocky){
 		//addNeighbours_Directional_Natural(blockx, blocky);//本方向（斜向）自然邻居。
 		Node* neighbour = m_holder->getMap()->getNode(blockx, blocky);
 		if(neighbour && !neighbour->isBlock()){
@@ -42,7 +42,7 @@ protected:
 			//return true;
 		}
 	}
-	void addNeighbours_Diagonal_Force(const int blockx, const int blocky, const int neighbourx, const int neighboury, bool walkable){
+	void addNeighbours_Diagonal_Force(const coord_type blockx, const coord_type blocky, const coord_type neighbourx, const coord_type neighboury, bool walkable){
 		if(walkable){
 			if(!m_holder->getMap()->isWalkableAt(blockx, blocky)){
 				Node* neighbour = m_holder->getMap()->getNode(neighbourx, neighboury);
