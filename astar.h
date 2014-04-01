@@ -5,9 +5,9 @@
 #include <cmath>
 class Map;
 class NeighbourExpander;
-typedef float (*DistanceFunc)(const Node* base, const Node* neighbour);
-float Euclidean(const Node* base, const Node* neighbour);
-float Diagonal(const Node* base, const Node* neighbour);
+typedef dis_type (*DistanceFunc)(const Node* base, const Node* neighbour);
+dis_type Euclidean(const Node* base, const Node* neighbour);
+dis_type Diagonal(const Node* base, const Node* neighbour);
 class AStar
 {
 public:
@@ -35,7 +35,7 @@ public:
 	const Map* getMap(){return m_map;}
 	void pushToOpen(const Node* node){m_open.push(node);}
 	bool inOpen(const Node* node) const{return m_open.has(node);}
-	float getDis(const Node* node, const Node* parent) const{return m_distanceFunc(node, parent);}
+	dis_type getDis(const Node* node, const Node* parent) const{return m_distanceFunc(node, parent);}
 
 	void insertNodeToOpen(Node* node, const Node* parent);
 	const Node* getEndNode(){return m_end;}

@@ -79,7 +79,7 @@ void AStar::insertNodeToOpen(Node *node, const Node* parent){
     {//如果是阻挡点，或者已经搜索过的点，pass
         return;
     }
-    const float newG = parent->getG() + m_distanceFunc(parent,node);
+    const dis_type newG = parent->getG() + m_distanceFunc(parent,node);
     if(m_open.has(node))
     {//如果已经出现在open表，检查g值，如果较小，就更新
         if(node->getG() > newG)
@@ -121,22 +121,23 @@ void AStar::setStardAndEnd(const Node& start, const Node& end)
 	}
 }
 
-float Euclidean(const Node *base, const Node *neighbour)
+dis_type Euclidean(const Node *base, const Node *neighbour)
 {//寻路的路径计算方式：直线法
-    const int absoluteX = abs(base->getX() - neighbour->getX());
-    const int absoluteY = abs(base->getY() - neighbour->getY());
-    const float square = absoluteX*absoluteX + absoluteY*absoluteY;
-    return std::sqrt(square);
+    const coord_type absoluteX = abs(base->getX() - neighbour->getX());
+    const coord_type absoluteY = abs(base->getY() - neighbour->getY());
+    const dis_type square = absoluteX*absoluteX + absoluteY*absoluteY;
+    return std::sqrt(static_cast<float>(square));
 }
 
 
-float Diagonal(const Node *base, const Node *neighbour)
+dis_type Diagonal(const Node *base, const Node *neighbour)
 {//寻路的路径计算方式：横，竖线+斜线法。实际上，游戏内就是使用这个来计算的。
     const int absoluteX = abs(base->getX() - neighbour->getX());
     const int absoluteY = abs(base->getY() - neighbour->getY());
     const int longD = std::max(absoluteX, absoluteY);
     const int shortD = std::min(absoluteX, absoluteY);
     //具体算法：短*斜向 + （长-短）*直向
-    return (float)shortD*1.414f + (float)(longD-shortD)*1.0f;
+	//这里使用了整数来代替1.414这样的浮点数。可以提升性能578->438,性能提升还是比较明显的。
+    return (dis_type)shortD*14 + (dis_type)(longD-shortD)*10;
     //征途2使用10，14（或15）来计算路径，从而避免了浮点数运算的问题。最后考虑这个。
 }
