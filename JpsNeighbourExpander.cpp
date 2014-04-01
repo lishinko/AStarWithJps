@@ -32,33 +32,33 @@ void JpsNeighbourExpander::findNeighbours(const Node* node){
 
 	if(dx != 0 && dy != 0){//斜线方向
 		//自然邻居
-		bool walkY = addNeighbours_Diagonal_Natural(x, y+dy, node);
-		bool walkX = addNeighbours_Diagonal_Natural(x+dx, y, node);
+		bool walkY = addNeighbours_Diagonal_Natural(x, y+dy);
+		bool walkX = addNeighbours_Diagonal_Natural(x+dx, y);
 		//if(walkX || walkY){
 		//	ret.push_back(m_holder->getMap()->getNode(x+dx, y+dy));//原算法这里没有判断有没有阻挡。不知道为什么。
 		//	//addNeighbours_Diagonal_DiagonalNatural(x+dx, y+dy);这是我认为的，需要判断阻挡的操作。先注释掉。以后看看有没有用
 		//}
 		//ret.push_back(m_holder->getMap()->getNode(x+dx, y+dy));//原算法这里没有判断有没有阻挡。不知道为什么。
-		addNeighbours_Diagonal_DiagonalNatural(x+dx, y+dy, node);
+		addNeighbours_Diagonal_DiagonalNatural(x+dx, y+dy);
 		//强制邻居
-		addNeighbours_Diagonal_Force(x-dx, y, x-dx, y+dy, walkY, node);
-		addNeighbours_Diagonal_Force(x, y-dy, x+dx, y-dy, walkY, node);
+		addNeighbours_Diagonal_Force(x-dx, y, x-dx, y+dy, walkY);
+		addNeighbours_Diagonal_Force(x, y-dy, x+dx, y-dy, walkY);
 	}
 	else{
 		if(dx != 0){//x方向
 			//自然邻居
-			addNeighbours_Directional_Natural(x + dx, y, node);
+			addNeighbours_Directional_Natural(x + dx, y);
 			//看看有没有强制邻居。
-			addNeighbours_Directional_Force(x, y+1, x+dx, y+1, node);
-			addNeighbours_Directional_Force(x, y-1, x+dx, y-1, node);
+			addNeighbours_Directional_Force(x, y+1, x+dx, y+1);
+			addNeighbours_Directional_Force(x, y-1, x+dx, y-1);
 		}
 		else{//y方向
 			assert(dy != 0);
 			//自然邻居
-			addNeighbours_Directional_Natural(x, y + dy, node);
+			addNeighbours_Directional_Natural(x, y + dy);
 			//看看有没有强制邻居。
-			addNeighbours_Directional_Force(x+1, y, x+1, y+dy, node);
-			addNeighbours_Directional_Force(x-1, y, x-1, y+dy, node);
+			addNeighbours_Directional_Force(x+1, y, x+1, y+dy);
+			addNeighbours_Directional_Force(x-1, y, x-1, y+dy);
 		}
 	}
 }
