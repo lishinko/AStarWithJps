@@ -27,16 +27,11 @@ class NeighbourIterator
 public:
     NeighbourIterator(const NodeRect& rect, const /*Node**/NodeIdx startNode)
         :m_coordIdx(0),m_rect(rect),m_startNode(startNode) {
-        operator ++();//保证刚开始调用的是正确的点
+        findNext();//保证刚开始调用的是正确的点
     }
     const NeighbourIterator& operator++(){//operator++必须保证找到的就是一个可以使用的邻居。
         ++m_coordIdx;
-        const int coordsSize = sizeof(coords) / sizeof(Point);
-        /*Node**/NodeIdx ret = getNeighbour(coordsSize, coords);
-        while(ret == -1 && m_coordIdx < coordsSize){//m_coordIdx < coordsSize这句话，应该可以提前到外面来。
-            ++m_coordIdx;
-            ret = getNeighbour(coordsSize, coords);
-        }
+        findNext();
         return *this;
     }
     /*Node**/NodeIdx operator*() const{
@@ -62,6 +57,14 @@ protected:
         const coord_type y = m_rect.getParts().getY(m_startNode) + coords[m_coordIdx].y;
         return m_rect.getNode(x, y);
     }
+	void findNext(){
+        const int coordsSize = sizeof(coords) / sizeof(Point);
+        /*Node**/NodeIdx ret = getNeighbour(coordsSize, coords);
+        while(ret == -1 && m_coordIdx < coordsSize){//m_coordIdx < coordsSize这句话，应该可以提前到外面来。
+            ++m_coordIdx;
+            ret = getNeighbour(coordsSize, coords);
+        }
+	}
 };
 class JpsNeighbourIterator : public NeighbourIterator
 {
