@@ -39,10 +39,12 @@ public:
 
 	void insertNodeToOpen(Node* node, const Node* parent);
 	const Node* getEndNode(){return m_end;}
+	void setNeedFullParentInfo(bool need){m_needFullParentInfo = need;}
 protected:
     FindPathResult findpathImpl();
     void expandSuccessors(const Node* node);
     bool inClosed(const Node* node){return std::find(m_closed.begin(), m_closed.end(), node) != m_closed.end();}
+	void setParent(Node* node, const Node* parent);
 	
 
 
@@ -51,6 +53,7 @@ protected:
     std::vector<const Node*> m_closed;//closed表就不需要排序了
     DistanceFunc m_distanceFunc;
 	NeighbourExpander* m_expander;
+	bool m_needFullParentInfo;//需要完整的网格路径吗?如果不需要(允许目标走直线,而不需要一格一格的走,一次跨越几个格子也可以的那种)
 
     const Node* m_start;
     const Node* m_end;

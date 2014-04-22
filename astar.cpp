@@ -4,10 +4,12 @@
 #include <stack>
 #include <iostream>
 #include "NeighbourExpander.h"
+#include <cassert>
 using namespace std;
 AStar::AStar()
     :m_distanceFunc(NULL)
     ,m_map(NULL)
+	,m_needFullParentInfo(false)
 {
 }
 
@@ -85,7 +87,7 @@ void AStar::insertNodeToOpen(Node *node, const Node* parent){
         if(node->getG() > newG)
         {
             node->setG(newG);
-            node->setParent(parent);
+			setParent(node, parent);
             m_open.sort();
         }
     }
@@ -93,7 +95,7 @@ void AStar::insertNodeToOpen(Node *node, const Node* parent){
     {//创建新open表节点。
         node->setH(m_distanceFunc(node, m_end));
         node->setG(newG);
-        node->setParent(parent);
+		setParent(node, parent);
         m_open.push(node);
     }
 }
@@ -120,7 +122,38 @@ void AStar::setStardAndEnd(const Node& start, const Node& end)
 		return;
 	}
 }
+void AStar::setParent(Node* node, const Node* parent){
+	if(!m_needFullParentInfo){
+		node->setParent(parent);
+		return;
+	}
 
+	//如果我们允许直线寻路(目标可以走直线而不管格子是不是相邻),那么下面的这些可以排除,从而提升一些性能.
+	//实际上,在一个水平的地面走的话,可以这么做(动画系统支持走无限长直线即可).
+	//如果地面有起伏,那么就必须一格一格的走(用来计算高度)
+
+	//如果一些点被跳过了,那么需要设置他们的父节点,但是不需要加入open表
+	const coord_type dx = parent->getX() - node->getX();
+	const coord_type dy = parent->getY() - node->getY();
+	assert(dx == 0 || dy == 0 || std::abs(dx) == std::abs(dy));//jps算法跳过的点总是直线,横竖斜都可以
+	if(dx == 0 && dy == 0){
+		return;
+	}
+	//如果是横线,那么stepy == 0,从而不会改变y方向,x方向同理.xy同时改变的时候,当然也是没有问题的
+	const coord_type stepx = dx == 0 ? 0 : std::abs(dx) / dx;//获得x发现,y方向的符号,结果有+1,-1,0,一共3种
+	const coord_type stepy = dy == 0 ? 0 : std::abs(dy) / dy;
+
+	Node* pCurNode = node;
+	for(int x = stepx, y = stepy; x != dx + stepx || y != dy+stepy; x+=stepx,y+=stepy){
+		Node* pDirectParent = m_map->getNode(node->getX() + x, node->getY() + y);
+		assert(pDirectParent);
+		if(pDirectParent){
+			pCurNode->setParent(pDirectParent);
+			pCurNode = pDirectParent;//接下来要设置pDirectParent的parent了,一直到parent节点本身为止
+		}
+	}
+	assert(pCurNode == parent);
+}
 dis_type Euclidean(const Node *base, const Node *neighbour)
 {//寻路的路径计算方式：直线法
     const coord_type absoluteX = abs(base->getX() - neighbour->getX());
