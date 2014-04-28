@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	NeighbourExpander ne(&astar);
 	JpsNeighbourExpander jne(&astar);
 	astar.setNeighbourExpander(&jne);
-	astar.setNeedFullParentInfo(true);
+	astar.setNeedFullParentInfo(false);
 
     
 
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 	
     astar.setMap(&map);
     Node* start = map.getNode(0,0);
-    Node* end = map.getNode(0,22);
+    Node* end = map.getNode(126,126);
     astar.setStardAndEnd(*start, *end);
 
 	ofstream os(result.c_str());

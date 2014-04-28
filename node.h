@@ -29,6 +29,7 @@ public:
     bool isBlock() const {return m_isBlock;}
 
     const Node* getParent() const{return m_parent;}
+	//Node* getParent() const {return m_parent;}
 
 protected:
     //dis_type f;

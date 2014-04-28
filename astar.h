@@ -30,7 +30,7 @@ public:
     void setDistanceFunc(DistanceFunc func){
         m_distanceFunc = func;
     }
-    std::vector<const Node*> getPath();
+	std::vector<const Node*> getPath();
 
 	const Map* getMap(){return m_map;}
 	void pushToOpen(const Node* node){m_open.push(node);}
@@ -54,6 +54,8 @@ protected:
     DistanceFunc m_distanceFunc;
 	NeighbourExpander* m_expander;
 	bool m_needFullParentInfo;//需要完整的网格路径吗?如果不需要(允许目标走直线,而不需要一格一格的走,一次跨越几个格子也可以的那种)
+	//填充完整的网格路径,效果比9fd0a87f6904af91394d0fc366df4371aba77dd2的时候更慢,不要使用!提交只是让自己记住这个问题
+	void fillPathHoles(Node* node, const Node* parent, std::vector<const Node*>& path);
 
     const Node* m_start;
     const Node* m_end;

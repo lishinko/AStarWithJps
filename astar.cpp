@@ -45,8 +45,15 @@ std::vector<const Node *> AStar::getPath()
 //        path.push_back(node);
 //        s.pop();
 //    }
-    for(const Node* pathNode = m_end; pathNode != NULL; pathNode = pathNode->getParent()){
+	Node* endNode = m_map->getNode(m_end->getX(), m_end->getY());
+    for(Node* pathNode = endNode; pathNode != NULL; ){
+		//fillPathHoles(pathNode, pathNode->getParent(), path);
         path.push_back(pathNode);
+		const Node* tmp = pathNode->getParent();
+		if(tmp)
+			pathNode = m_map->getNode(tmp->getX(), tmp->getY());
+		else
+			break;
     }
     cout << path.size() << endl;
     return path;
@@ -149,6 +156,33 @@ void AStar::setParent(Node* node, const Node* parent){
 		assert(pDirectParent);
 		if(pDirectParent){
 			pCurNode->setParent(pDirectParent);
+			pCurNode = pDirectParent;//接下来要设置pDirectParent的parent了,一直到parent节点本身为止
+		}
+	}
+	assert(pCurNode == parent);
+}
+void AStar::fillPathHoles(Node* node, const Node* parent, std::vector<const Node*>& path)
+{
+	if(!parent)
+		return;
+	//如果一些点被跳过了,那么需要设置他们的父节点,但是不需要加入open表
+	const coord_type dx = parent->getX() - node->getX();
+	const coord_type dy = parent->getY() - node->getY();
+	assert(dx == 0 || dy == 0 || std::abs(dx) == std::abs(dy));//jps算法跳过的点总是直线,横竖斜都可以
+	if(dx == 0 && dy == 0){
+		return;
+	}
+	//如果是横线,那么stepy == 0,从而不会改变y方向,x方向同理.xy同时改变的时候,当然也是没有问题的
+	const coord_type stepx = dx == 0 ? 0 : std::abs(dx) / dx;//获得x发现,y方向的符号,结果有+1,-1,0,一共3种
+	const coord_type stepy = dy == 0 ? 0 : std::abs(dy) / dy;
+
+	Node* pCurNode = node;
+	for(int x = stepx, y = stepy; x != dx + stepx || y != dy+stepy; x+=stepx,y+=stepy){
+		Node* pDirectParent = m_map->getNode(node->getX() + x, node->getY() + y);
+		assert(pDirectParent);
+		if(pDirectParent){
+			pCurNode->setParent(pDirectParent);
+			path.push_back(pDirectParent);
 			pCurNode = pDirectParent;//接下来要设置pDirectParent的parent了,一直到parent节点本身为止
 		}
 	}
